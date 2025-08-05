@@ -1,0 +1,12 @@
+name: "blog"
+title: "Data Science &amp; Economics"
+description: |
+  Data Science &amp; Economics
+output_dir: "docs"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+output: distill::distill_article
