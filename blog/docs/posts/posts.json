@@ -1,19 +1,19 @@
 [
   {
     "path": "posts/welcome/",
-    "title": "Welcome to Data Science &amp; Economics",
-    "description": "Welcome to our new blog, Data Science &amp; Economics. We hope you enjoy \nreading what we have to say!",
+    "title": "Welcome!",
+    "description": "Welcome to my new blog, Data Science &amp; Economics. I hope you enjoy reading my content.",
     "author": [
       {
-        "name": "Nora Jones",
-        "url": "https://example.com/norajones"
+        "name": "David Heilbron",
+        "url": "https://davidheilbron.com"
       }
     ],
     "date": "2025-08-05",
     "categories": [],
-    "contents": "\n\n\n\n",
+    "contents": "\nMy name is David, I’m an Economist from Icesi University in Cali, Colombia and a Data Scientist from the University of Milan. This blog is an attempt to bring out topics of my interest and domain and make them available to the public.\nThis is the first time I write a blog, so there’s a lot of learning going on right now. I don’t consider myself an expert in Economics or Data Science, but a day-to-day citizen willing to learn by doing and to give its two cents to the plethora of available knowledge in the internet.\nI will try my best to be original and give it my own twist, hopefully I can print (?) my values and skills into the blog, thus proposing discussions, stating my views, and hopefully, inspiring others.\nAs a personal side note, I consider people (myself included) nowadays got used to have a passive role in society, not expressing their thoughts, not committing to anything, not exposing themselves or taking risks, not having uncomfortable conversations. I can’t control the world, but I can definitely chose the path I want for my life, and writing is part of it.\nI’m from Cali, Colombia. Based in Munich, Germany.\n\n\n\n",
     "preview": {},
-    "last_modified": "2025-08-05T19:46:32+02:00",
-    "input_file": {}
+    "last_modified": "2025-08-05T20:38:27+02:00",
+    "input_file": "welcome.knit.md"
   }
 ]
