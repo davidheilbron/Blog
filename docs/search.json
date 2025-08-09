@@ -2,18 +2,18 @@
   "articles": [
     {
       "path": "about.html",
-      "title": "About this blog",
+      "title": "CV",
       "description": "Some additional details about the blog",
       "author": [],
-      "contents": "\n\n\n\n",
-      "last_modified": "2025-08-09T20:28:41+02:00"
+      "contents": "\nCurriculum Vitae\n\n📄 Download my CV (PDF)\n\n\n\n\n",
+      "last_modified": "2025-08-09T20:38:14+02:00"
     },
     {
       "path": "index.html",
       "title": "Blog",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2025-08-09T20:28:41+02:00"
+      "last_modified": "2025-08-09T20:38:14+02:00"
     }
   ],
   "collections": ["posts/posts.json"]

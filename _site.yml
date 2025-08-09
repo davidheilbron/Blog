@@ -6,8 +6,8 @@ base_url: https://davidheilbron.com
 output_dir: "docs"
 navbar:
   right:
-    - text: "Home"
+    - text: "Blog"
       href: index.html
-    - text: "About"
+    - text: "CV"
       href: about.html
 output: distill::distill_article
