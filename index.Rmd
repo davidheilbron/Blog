@@ -1,5 +1,6 @@
 ---
-title: "Data Science &amp; Economics"
+title: "Data Science & Economics"
 site: distill::distill_website
 listing: posts
 ---
+
