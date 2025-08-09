@@ -1,7 +1,7 @@
 ---
 title: "Welcome!"
 description: |
-  Welcome to my new blog, Data Science &amp; Economics. I hope you enjoy reading my content.
+  Welcome to my new blog, Data Science & Economics. I hope you enjoy reading my content.
 author:
   - name: David Heilbron 
     url: https://davidheilbron.com
