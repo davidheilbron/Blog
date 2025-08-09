@@ -1,12 +1,12 @@
 name: "data_science_and_economics"
-title: "Data Science & Economics"
+title: "D. Heilbron"
 description: |
-  Data Science & Economics blog
+  Personal webpage
 base_url: https://davidheilbron.com
 output_dir: "docs"
 navbar:
   right:
-    - text: "Home 2"
+    - text: "Home"
       href: index.html
     - text: "About"
       href: about.html
