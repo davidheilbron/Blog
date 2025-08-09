@@ -1,7 +1,8 @@
-name: "blog"
+name: "data_science_and_economics"
 title: "Data Science &amp; Economics"
 description: |
-  Data Science &amp; Economics
+  Data Science &amp; Economics blog
+base_url: https://davidheilbron.com
 output_dir: "docs"
 navbar:
   right:
