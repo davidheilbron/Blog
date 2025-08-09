@@ -1,7 +1,6 @@
 ---
-title: "CV"
-description: |
-  Some additional details about the blog
+title: "Résumé"
+description: "As of August 2025"
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Curriculum Vitae
 
 <!-- Download link -->
-[📄 Download my CV (PDF)](files/cv.pdf){target="_blank" rel="noopener"}
+[📄 Download (PDF)](files/cv.pdf){target="_blank" rel="noopener"}
 
 <!-- Embedded display -->
 <embed src="files/cv.pdf" type="application/pdf" width="100%" height="800px" />
