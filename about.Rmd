@@ -7,8 +7,6 @@ description: "As of August 2025"
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Curriculum Vitae
-
 <!-- Download link -->
 [📄 Download (PDF)](files/cv.pdf){target="_blank" rel="noopener"}
 
