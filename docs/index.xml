@@ -6,15 +6,20 @@
     <atom:link href="https://davidheilbron.com/index.xml" rel="self" type="application/rss+xml"/>
     <description>Personal webpage
 </description>
+    <image>
+      <title>David Heilbron</title>
+      <url>https://davidheilbron.com/images/img_2.png</url>
+      <link>https://davidheilbron.com</link>
+    </image>
     <generator>Distill</generator>
-    <lastBuildDate>Mon, 04 Aug 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 05 Aug 2025 00:00:00 +0000</lastBuildDate>
     <item>
       <title>Welcome!</title>
       <dc:creator>David Heilbron</dc:creator>
       <link>https://davidheilbron.com/posts/welcome</link>
       <description>Welcome to my new blog, Data Science &amp; Economics. I hope you enjoy reading my content.</description>
       <guid>https://davidheilbron.com/posts/welcome</guid>
-      <pubDate>Mon, 04 Aug 2025 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 05 Aug 2025 00:00:00 +0000</pubDate>
     </item>
   </channel>
 </rss>
