@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/the_money_promise/",
+    "title": "The Money Promise: Our Shared Expectation",
+    "description": "Let's see what money is all about, how do we measure it and what to expect from it.",
+    "author": [
+      {
+        "name": "David Heilbron",
+        "url": "https://davidheilbron.com"
+      }
+    ],
+    "date": "2025-12-08",
+    "categories": [],
+    "contents": "\nThe Money Promise\n\n\n\n",
+    "preview": {},
+    "last_modified": "2025-08-12T14:26:04+02:00",
+    "input_file": "the_money_promise.knit.md"
+  },
+  {
     "path": "posts/welcome/",
     "title": "Welcome!",
     "description": "Welcome to my new blog, Data Science & Economics. I hope you enjoy reading my content.",

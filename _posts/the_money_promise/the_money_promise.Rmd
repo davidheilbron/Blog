@@ -1,0 +1,40 @@
+---
+title: "The Money Promise"
+subtitle: "Our Shared Expectation"
+description: |
+  Let's see what money is all about, how we measure it, and what to expect from it.
+author:
+  - name: "David Heilbron"
+    url: "https://davidheilbron.com"
+date: "2025-08-12"
+draft: true
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+
+
+```
+
+*Disclaimer: I'm a heavy AI user. I use it to check references, improve text, debug code and search for databases. I intend this blog to be leveraged on AI capabilities and to offer features to it's readers that were not possible before. I'm embracing the technology as much as possible and will continue to do so.*
+
+This post will open a discussion on money, it's value, how it's measured, and how does it move around the world. I expect to generate more doubts and questions than the ones I'm attempting to answer, and to provide you, my reader, with some ground to stand and move onto more advanced topics.
+
+What is money doing in our lives and why do we actually use it? Well, it is kind of straightforward, isn't it? We could trade with goods instead of paper money, say salt, cigarettes, silver; but that's quite difficult to standardize, physically move, and sometimes, store. Therefore, as Meltzer and Friedman wrote, *money is the medium in which prices and values are expressed; as currency, it circulates anonymously from person to person and country to country, thus facilitating trade, and its the principal measure of wealth.* One of it's functions is therefore to enable buying to be separated from selling. If we were trading goods, we'd sooner than later arrive at the so-called double coincidence of barter.
+
+Clear, but where does it get its value from? who or what  guarantees that 10 euros are 10 euros? Furthermore, what does it mean to have *10 euros*, exactly?
+Money gets its value from us, the citizens of a territory, country, or group of countries. We all agree, implicitly - nobody asked us if we actually believe in this or not - that an euro, dollar, yuan, or peso, has value equivalent to certain amount, which we can exchange for another good or service, or we can just hold. In economics, we call money the **numéraire good**, and it has a value equal to 1, and allow us to find the price relationship of all the goods in the economy. In other words, it's nominal value (what's printed on the banknote) doesn't actually matter, it doesn't matter if it's 1, 10, or 500, what matters is what it can be exchanged for, e.g. 2 kg of bananas, 5 cars, 2 islands in The Caribbean, whatever, as long as it holds the price relationship.
+
+Who guarantees it's value then? That's the central banks role. Each currency is issued by an institution, that's the central bank, and it can produce money for a country or a group of countries (e.g., The European Central Bank issues the Euro, the Central Bank of West African States issues the West African franc), which means that a government doesn't necessarily manages the money in circulation of the territory it governs, e.g. Ecuador, Panama, Timor-Leste, Marshall Islands, British Virgin Islands, and many others use the US Dollar as standard currency, hence have no control over their monetary policy, which is dictated by the Federal Reserve System (FED) in Washington D.C..
+
+It is then the goal of the central banks to maintain the value of their currency, i.e. to make people feel and think that it's currency *has* value, and can be used to trade, to store value, and to exchange information with other economic agents (people, companies, institutions, etc). And people actually need to believe that, because if not, economies get into big troubles and wealth is destroyed, literally. Some examples of this are the Weimar Republic Hyperinflation (1921 - 1923), the Mexican Peso crisis (1994 - 1995), Asian Financial Crisis (1997 - 1998) and the Argentinian Currency Crisis of the early 2000s. There are many factors that came into play and this space is not enough to rigorously talk about them, but confidence is one of the key elements that drive monetary crisis and economic depression.
+
+Next questions to ask would be, how do the central banks keep the value of their currency? Why the value isn't kept by itself? And what decisions are made in order to stir the rudder when things are going south? Let's start with the second question, the answer is that currencies can't keep it's value because money is a good itself, and one of it's functions is to be a pivot good that facilitates trade. If there's not enough money to carry-on transactions (demand higher than offer) it's value will decrease, and vice-versa. We must add that the demand of money id dynamic, not static, so central banks try to monitor it and control the supply of money so it matches the demand and the value is kept. If they are successful doing this is a topic for another entry. The value of the money is measured through inflation, and this is basically how much value is losing a currency in a given period. Causes are multiple.
+
+Central banks have several tools to intervene the monetary market and making it looser or tighter. The main tool is the interest rate, which is actually the overnight policy rate at which commercial banks borrow from the central bank. There are also open market operations (OMO), reserve requirements, quantitative easing (QE), and forward guidance. These measures have an effect on the physical supply of money and on the people's belief systems and expectations. Central banks must generate trust in the people, so people can believe on the value held by the money. Lately this has been put into question everywhere in the world, allowing for a surge in the crypto-assets global demand as a store of value. When things go south, e.g., inflation gets higher than expected, then the banks would normally raise the interest rate in order to incentive savings and retention of the paper money rather than use it *in the present*. Here we get into a new realm which is inter-temporal preference, which is mediated by the interest rates, or to put it in simpler words, money is the promise of a better future.
+
+
