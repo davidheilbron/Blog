@@ -6,35 +6,418 @@ description: |
 author:
   - name: "David Heilbron"
     url: "https://davidheilbron.com"
-date: "2025-08-12"
-draft: true
+date: "2025-08-17"
 output:
   distill::distill_article:
     self_contained: false
+bibliography: references.bib
+link-citations: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE,      # Hide all code chunks by default
+  message = FALSE,   # Hide messages from packages loading or functions
+  warning = FALSE,   # Hide warnings
+  fig.width = 8,     # Default figure width
+  fig.height = 5     # Default figure height
+)
 
+# Load required libraries
+library(ecb)
+library(tidyverse)
+library(ggplot2)
+library(paletteer)
+library(readxl)
+library(lubridate)
+
+colors <- paletteer_d("beyonce::X1")
+accent <- paletteer_d("lisa::OskarSchlemmer")
+
+```
+
+*Disclaimer: I'm a heavy AI user. I use it to check references, improve text, debug code and search for databases. I intend this blog to be leveraged on AI capabilities and to offer features to its readers that were not possible before. I'm embracing the technology as much as possible and will continue to do so.*
+
+Please criticize me, I'm here to learn and open to constructive discussions.
+
+This post will open a discussion on money, its value, how it's measured, and how does it move around the world. I expect to generate more doubts and questions than the ones I'm attempting to answer, and to provide you, my reader, with some ground to stand and move onto more advanced topics. Today I'll provide examples using data from the European Central Bank, publicly available free of cost for everyone.
+
+## Money in our lives
+
+What is money doing in our lives and why do we actually use it? Well, it is kind of straightforward, isn't it? We could instead trade with goods directly (barter economy) [@friedman1963monetary] , say salt, cigarettes, silver; but that's quite difficult to standardize, physically move, and sometimes, store. Therefore, as Meltzer and Friedman wrote, *money is the medium in which prices and values are expressed; as currency, it circulates anonymously from person to person and country to country, thus facilitating trade, and it is the principal measure of wealth.* As they put it simply: *money's function is to enable buying to be separated from selling. If we were trading goods, we'd sooner than later arrive at the so-called double coincidence of barter.*
+
+Clear, but where does it get its value from? who or what  guarantees that 10 euros are 10 euros? The short answer is that money has value because society accepts it in exchange for goods, services, and the settlement of debts. But the full picture is more nuanced. We all agree, implicitly - nobody asked us if we actually believe in this or not [@graeber2011debt] - that a euro, dollar, yuan, or peso, has value equivalent to its nominal amount, which we can exchange for another good or service, or we can just accumulate in reserves. 
+
+In economics, we often describe money as the **numéraire good** [@mascolell1995microeconomic] . This means it serves as the unit in which all other prices are quoted. Importantly, this is a matter of convention, not intrinsic value: we could just as well measure everything in bananas, ounces of gold, or barrels of oil. Setting money as the numéraire is simply a convenient normalization that allows us to express the relative values of all goods and services.
+
+# How is money measured
+
+Money can be classified in different categories, it can be physical or digital, it can represent different levels of liquidity, and more. To simplify things, I'll mention under the physical realm there's fiat money, which doesn't have intrinsic value (US dollars, rubles, yens), paper certificates which are convertible into goods (e.g. for gold or silver); under the digital realm there are digital currencies (e.g., Bitcoin, game currencies); and there are different levels of liquidity, or formally called Monetary Aggregates, and they are measured by Central Banks and a key reference for monetary policy. I will take a small detour just to show some real-world data on this.
+
+Monetary Aggregates are mostly three, and they are based on liquidity levels (how easy they can be spent). I must say also that not all Central Banks measure their money supply exactly the same way, there are usually some discrepancies. Let's take the European Central Bank (ECB) and its definitions:
+
+- **M1 (narrow money)**: is the most liquid measure of money, comprising currency (banknotes and coins) in circulation and overnight deposits.
+- **M2**: M1 + deposits with an agreed maturity of up to two years and deposits redeemable at notice of up to three months.
+- **M3**: M2 + repurchase agreements, money market fund shares/units, and debt securities with a maturity of up to two years issued by MFI (Monetary Financial Institutions).
+
+```{r monetary_aggregates}
+
+# Monetary Aggregates level
+
+m1_key <- "BSI.M.U2.Y.V.M10.X.1.U2.2300.Z01.E"
+m2_key <- "BSI.M.U2.Y.V.M20.X.1.U2.2300.Z01.E"
+m3_key <- "BSI.M.U2.Y.V.M30.X.1.U2.2300.Z01.E"
+
+gdp_key <- "MNA.Q.Y.I9.W2.S1.S1.B.B1GQ._Z._Z._Z.EUR.LR.G1"
+
+# Download M1, M2, M3 series
+m1 <- get_data(m1_key) %>% mutate(aggregate = "M1")
+m2 <- get_data(m2_key) %>% mutate(aggregate = "M2")
+m3 <- get_data(m3_key) %>% mutate(aggregate = "M3")
+
+# Combine monetary aggregates data
+all_data <- bind_rows(m1, m2, m3) %>%
+  select(obstime, obsvalue, aggregate) %>%
+  mutate(obstime = convert_dates(obstime))
+
+# Wide format for ggplot
+all_data_wide <- all_data %>%
+  pivot_wider(names_from = aggregate, values_from = obsvalue)
+
+
+# Get GDP recession highlights
+gdp <- get_data(gdp_key) %>% mutate(aggregate = "GDP")
+gdp_highlights <- gdp %>%
+  filter(obsvalue < 0) %>%
+  mutate(
+    year = as.numeric(substr(obstime, 1, 4)),
+    quarter = as.numeric(substr(obstime, 7, 7)),
+    xmin = as.Date(paste0(year, "-", (quarter - 1) * 3 + 1, "-01")),
+    xmax = xmin %m+% months(3) - days(1),  # quarter end date
+    ymin = -Inf,
+    ymax = Inf
+  ) 
+
+
+# Plot
+ggplot(all_data, aes(x = obstime, y = obsvalue / 1000, color = aggregate)) +
+  geom_rect(
+    data = gdp_highlights,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "red",
+    alpha = 0.2,
+    inherit.aes = FALSE
+  ) +
+  geom_line(linewidth = 1,
+            alpha = .8) +
+  labs(
+    title = "ECB Monetary Aggregates (Euro Area)",
+    subtitle = "Monthly data, working day and seasonally adjusted",
+    y = "EUR th. millions",
+    x = NULL,
+    color = "Aggregate",
+    caption = "Source: ECB. Shaded areas highlight quarters of negative m-o-m GDP  growth."
+  ) +
+  scale_y_continuous(labels = scales::comma) +
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white")
+  )+
+  scale_color_paletteer_d("beyonce::X1")
+
+```
+The graph above is telling us the value of the money supply from the European Central Bank, i.e. the value of all the euros equivalent forms of money. For example, in June 2025 the M1 registered a value of EUR 10,805 thousand millions, meaning that's the value of cash and immediate available deposits in the Euro Area economy. This is the amount of money that is readily available for spending and payments. We can have another look at how much it is increasing, year-over-year.
+
+```{r monetary_aggregates_growth}
+
+# Monetary Aggregates year-over-year growth
+
+m1_key <- "BSI.M.U2.Y.V.M10.X.I.U2.2300.Z01.A"
+m2_key <- "BSI.M.U2.Y.V.M20.X.I.U2.2300.Z01.A"
+m3_key <- "BSI.M.U2.Y.V.M30.X.I.U2.2300.Z01.A"
+
+# Download M1, M2, M3 series
+m1 <- get_data(m1_key) %>% mutate(aggregate = "M1")
+m2 <- get_data(m2_key) %>% mutate(aggregate = "M2")
+m3 <- get_data(m3_key) %>% mutate(aggregate = "M3")
+
+# Combine data
+all_data <- bind_rows(m1, m2, m3) %>%
+  select(obstime, obsvalue, aggregate) %>%
+  mutate(obstime = convert_dates(obstime))
+
+# Wide format for ggplot
+all_data_wide <- all_data %>%
+  pivot_wider(names_from = aggregate, values_from = obsvalue)
+
+
+# Plot
+ggplot(all_data, aes(x = obstime, y = obsvalue, color = aggregate)) +
+  geom_line(linewidth = 1,
+            alpha = .8) +
+  labs(
+    title = "ECB Monetary Aggregates (Euro Area)",
+    subtitle = "Monthly data, y-o-y growth, working day and seasonally adjusted",
+    y = "(%)",
+    x = NULL,
+    color = "Aggregate",
+    caption = "Source: European Central Bank."
+  ) +
+  geom_hline(yintercept = 0,
+             linetype = "dashed",
+             color = "gray50",
+             size = 0.5)+
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white")
+  )+
+  scale_color_paletteer_d("beyonce::X1")
+
+```
+We could interpret the graph above in the following way. In June 2025, M1 in the euro area grew by 4.6% compared with June 2024, faster than M2 (2.8%) and M3 (3.3%). At first glance, one might think this reflects an “injection of money” by the European Central Bank, followed by banks lending more to customers. 
+
+In reality, the story is more complex. With the information available at this point, we can only guess about the causes of the increase; on one hand, it can be a reaction on monetary policy changes or changes on the private sector's liquidity preferences. A real interpretation would require a broader macroeconomic and policy context.
+
+## The Role of the Central Banks
+
+Who guarantees the currency value? That's the central banks role, sometimes. In reality in depends on the Central Bank's objective, which differs widely across geographies. Each currency is issued by an institution, that's almost always a Central Bank, and it can issue tender for a region, country or a group of countries, e.g., the Hong Kong Monetary Authority backs up the Hong Kong dollar, the European Central Bank issues the Euro. 
+
+Thus, a given government doesn't necessarily control the monetary policy on its territory, e.g. Ecuador, Panama, Timor-Leste, Marshall Islands, British Virgin Islands, and many others use the US Dollar as standard currency, hence have no control over their monetary policy, which is dictated by the Federal Reserve System (FED) in Washington D.C.. And, as you might be aware, the US dollar is the reserve currency in the world since the end of World War Two.
+
+Every Central Bank has a different mandate given by the Constitution of the country or union it belongs to, hence, not all Central Banks work the same way, but it's safe to assume, in broad terms, that its goal is to maintain the stability of their currency, either in terms of domestic purchasing power or exchange rate stability. Some Central Banks have mandates on employment or on financial stability, and this is what shapes their tools and the nature of their interventions. The Central Bank then needs to build trust in society, so their mandates can be achieved, to put it simply, it needs to be seen as a responsible institution which is able to pay its debts and manage the money supply responsibly.
+
+The crucial element is that people actually need to trust the Central Banks, because if not, economies get into big troubles and wealth is destroyed, literally. Some examples of this are the Weimar Republic Hyperinflation (1921 - 1923), the Mexican Peso crisis (1994 - 1995), Asian Financial Crisis (1997 - 1998) and the Argentinian Currency Crisis of the early 2000s [@graham1930hyperinflation] .
+
+Just as currencies rely on people’s confidence that others will accept them, banks depend on trust to function. When you deposit money, you expect it to be available at any time, even though the bank has already lent most of it out or invested it elsewhere. This system of maturity transformation, i.e. borrowing short-term from depositors while lending long-term to households, firms, or governments, works smoothly in normal times and is central to how banks create value. Yet it also introduces fragility: if too many people demand their deposits back at once, the bank may be unable to liquidate its long-term assets quickly without incurring heavy losses.
+
+This fragility is what makes bank runs possible [@diamond1983bank] . Even a solvent bank can collapse if confidence evaporates and depositors rush to withdraw simultaneously. Because fear can spread rapidly, such runs often jump from one institution to others, turning isolated concerns into a systemic crisis.
+
+Deposit insurance, central bank emergency lending, and tighter regulation all exist to contain this risk, but they do not eliminate the fundamental reliance on trust. In both money and banking, stability rests not only on balance sheets but also on the shared belief that others will continue to trust the system tomorrow.
+
+The system is intrinsically based on trust and needs people to trust that the banks will have the cash when they need it or that the banks will pay the promised interest on deposits. On the other hand, the banks need to trust the Central Bank that their reserves are also safeguarded, as well as to trust its debtors that the debts will be paid. This can be seen also from the perspective of information gathering, and asymmetries of information, which is a fascinating topic in economics as well. 
+
+Part of the plethora of economic information available nowadays in western countries are expectation surveys, which decision makers incorporate into their analysis when guiding economic policy [@muth1961rational] . I'm getting ahead of myself here, but to illustrate this, below is one of the many monthly surveys conducted by the ECB.  
+
+We will take a look at the **Consumer Expectations Survey**, which is a mixed frequency modular survey, conducted online. More methodological details are available [here](https://www.ecb.europa.eu/stats/ecb_surveys/consumer_exp_survey/shared/pdf/CES_methodological_guide.en.pdf)
+
+```{r survey_consumer_expectations}
+
+survey <- read_excel("/Users/davidheilbron/R/Datasets/ecb.CES_aggregate_indicators.en.xlsx", sheet = "Housing and credit access")
+
+survey <- survey %>% mutate(wave = as.Date(paste0("01/", survey$wave),
+                                            format = "%d/%m/%Y")) %>% 
+  filter(Var == "c2110", Breakdown == "Wave") %>% 
+  select(wave, Up, Down, Net_perc) %>% 
+  pivot_longer(cols = -wave,
+               names_to = "Variable",
+               values_to = "Value")
+
+# Plot
+ggplot() +
+  geom_col(data = survey %>% filter(Variable == "Net_perc"),
+           aes(x= wave, y = Value, fill = Variable),
+           position = "dodge") +
+  geom_line(data = survey %>% filter(Variable %in% c("Up", "Down")), 
+            aes(x = wave, y = Value, color = Variable),
+            linewidth = 1, alpha = .8) +
+  labs(
+    title = "ECB Consumer Expectations Survey",
+    subtitle = "Home price expectations 12 months ahead – qualitative",
+    y = "(%)",
+    x = NULL,
+    caption = "Source: European Central Bank."
+  ) +
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white"),
+    legend.position = "top",
+    legend.justification = "center",
+    legend.box.just = "center",
+    legend.direction = "horizontal"
+  ) +
+  scale_fill_paletteer_d("nbapalettes::hornets_city2",
+                         name = NULL, 
+                         guide = "legend",
+                         labels = c("Net percentage"))+    # columns
+  scale_color_paletteer_d("beyonce::X1",
+                          name = NULL,
+                          guide = "legend")     # lines
 
 
 ```
 
-*Disclaimer: I'm a heavy AI user. I use it to check references, improve text, debug code and search for databases. I intend this blog to be leveraged on AI capabilities and to offer features to it's readers that were not possible before. I'm embracing the technology as much as possible and will continue to do so.*
+The graph above tells us the percentage of the surveyed people that think the price of houses will increase in the next 12 months, the percentage that think the prices will decrease and the difference between both. The role of expectations in the economy is a topic that has been widely studied for around 200 years, and modern economic measurements incorporate them into their statistics, as well as policy makers when evaluating results or need to make decisions.
 
-This post will open a discussion on money, it's value, how it's measured, and how does it move around the world. I expect to generate more doubts and questions than the ones I'm attempting to answer, and to provide you, my reader, with some ground to stand and move onto more advanced topics.
+## The toolbox of a Central Bank
 
-What is money doing in our lives and why do we actually use it? Well, it is kind of straightforward, isn't it? We could trade with goods instead of paper money, say salt, cigarettes, silver; but that's quite difficult to standardize, physically move, and sometimes, store. Therefore, as Meltzer and Friedman wrote, *money is the medium in which prices and values are expressed; as currency, it circulates anonymously from person to person and country to country, thus facilitating trade, and its the principal measure of wealth.* One of it's functions is therefore to enable buying to be separated from selling. If we were trading goods, we'd sooner than later arrive at the so-called double coincidence of barter.
+We just saw an example of expectation measurement from the ECB, that's actually part of their toolbox. Qualitative and quantitative information from the market helps set the direction of the policies in place. Let's dig further with the following two questions:
 
-Clear, but where does it get its value from? who or what  guarantees that 10 euros are 10 euros? Furthermore, what does it mean to have *10 euros*, exactly?
-Money gets its value from us, the citizens of a territory, country, or group of countries. We all agree, implicitly - nobody asked us if we actually believe in this or not - that an euro, dollar, yuan, or peso, has value equivalent to certain amount, which we can exchange for another good or service, or we can just hold. In economics, we call money the **numéraire good**, and it has a value equal to 1, and allow us to find the price relationship of all the goods in the economy. In other words, it's nominal value (what's printed on the banknote) doesn't actually matter, it doesn't matter if it's 1, 10, or 500, what matters is what it can be exchanged for, e.g. 2 kg of bananas, 5 cars, 2 islands in The Caribbean, whatever, as long as it holds the price relationship.
+- How do Central Banks execute their mandate?
+- Why do Central Banks need to intervene? 
 
-Who guarantees it's value then? That's the central banks role. Each currency is issued by an institution, that's the central bank, and it can produce money for a country or a group of countries (e.g., The European Central Bank issues the Euro, the Central Bank of West African States issues the West African franc), which means that a government doesn't necessarily manages the money in circulation of the territory it governs, e.g. Ecuador, Panama, Timor-Leste, Marshall Islands, British Virgin Islands, and many others use the US Dollar as standard currency, hence have no control over their monetary policy, which is dictated by the Federal Reserve System (FED) in Washington D.C..
+Let's start with the second question, for which the Quantity Theory of Money would answer that currencies can't keep its value constant because money is a good itself, subject to the laws of supply and demand [@fisher1911purchasing]. If there's not enough money following the transactions (demand higher than offer) its value will increase, and vice-versa. 
 
-It is then the goal of the central banks to maintain the value of their currency, i.e. to make people feel and think that it's currency *has* value, and can be used to trade, to store value, and to exchange information with other economic agents (people, companies, institutions, etc). And people actually need to believe that, because if not, economies get into big troubles and wealth is destroyed, literally. Some examples of this are the Weimar Republic Hyperinflation (1921 - 1923), the Mexican Peso crisis (1994 - 1995), Asian Financial Crisis (1997 - 1998) and the Argentinian Currency Crisis of the early 2000s. There are many factors that came into play and this space is not enough to rigorously talk about them, but confidence is one of the key elements that drive monetary crisis and economic depression.
+As with any good, currency demand is dynamic, requiring constant monitoring from Central Banks to allow for control of its supply and create conditions for equilibrium. This framework is not the only plausible explanation for the currency's value loss, other factors come into play such as expectations and supply and demand shocks. This translates itself on the need of the institutions to intervene and bring stability into the market, as the unpredictability and volatility of this economics aggregates is quite obvious.
 
-Next questions to ask would be, how do the central banks keep the value of their currency? Why the value isn't kept by itself? And what decisions are made in order to stir the rudder when things are going south? Let's start with the second question, the answer is that currencies can't keep it's value because money is a good itself, and one of it's functions is to be a pivot good that facilitates trade. If there's not enough money to carry-on transactions (demand higher than offer) it's value will decrease, and vice-versa. We must add that the demand of money id dynamic, not static, so central banks try to monitor it and control the supply of money so it matches the demand and the value is kept. If they are successful doing this is a topic for another entry. The value of the money is measured through inflation, and this is basically how much value is losing a currency in a given period. Causes are multiple.
+A key measurement Central Bank follows is inflation, which is an estimation of the price increase of certain goods in a specific period of time. There's monetary inflation and consumer price inflation, which differ on the underlying causes for the price increase. To exemplify this, here we can see the trend of the consumer price inflation (CPI) in the Euro area from 1997 until July 2025.
 
-Central banks have several tools to intervene the monetary market and making it looser or tighter. The main tool is the interest rate, which is actually the overnight policy rate at which commercial banks borrow from the central bank. There are also open market operations (OMO), reserve requirements, quantitative easing (QE), and forward guidance. These measures have an effect on the physical supply of money and on the people's belief systems and expectations. Central banks must generate trust in the people, so people can believe on the value held by the money. Lately this has been put into question everywhere in the world, allowing for a surge in the crypto-assets global demand as a store of value. When things go south, e.g., inflation gets higher than expected, then the banks would normally raise the interest rate in order to incentive savings and retention of the paper money rather than use it *in the present*. Here we get into a new realm which is inter-temporal preference, which is mediated by the interest rates, or to put it in simpler words, money is the promise of a better future.
+```{r inflation}
+hicp_key <- "ICP.M.U2.N.000000.4.ANR"
+hicp <- get_data(hicp_key) %>% mutate(series = "HICP")
+
+hicp <- hicp %>% 
+  select(obstime, obsvalue, series) %>%
+  mutate(obstime = convert_dates(obstime))
+
+# Plot
+ggplot(hicp, aes(x = obstime, y = obsvalue)) +
+  geom_line(linewidth = 1,
+            alpha = .8) +
+  labs(
+    title = "Harmonized Index of Consumer Prices (HICP)",
+    subtitle = "Monthly percentage change, Euro area",
+    y = "(%)",
+    x = NULL,
+    caption = "Source: ECB."
+  ) +
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white")
+  )+
+  scale_color_paletteer_d("beyonce::X1")
+
+```
+
+To answer the first question, Central Banks have several tools to intervene the money supply, to increase or decrease it. The primary tool is the set of key policy interest rates, among which the Main Refinancing Operations (MRO) rate is central [@mishkin2007economics] . This rate is the overnight lending rate at which commercial banks borrow funds from the central bank, thereby influencing short-term interest rates and liquidity conditions in the banking system.
+
+Besides the MRO rate, the central bank also sets the Deposit Facility rate and the Marginal Lending Facility rate, which establish the corridor for overnight market rates. These key rates collectively steer borrowing costs and incentives for saving or spending.
+
+Additionally, central banks conduct open market operations (OMO), i.e. buying or selling securities—to manage money supply and short-term interest rates. They also impose reserve requirements on banks, which set the minimum reserves banks must hold, directly impacting their lending capacity.
+
+In recent years, non-traditional tools like quantitative easing (QE)—large-scale asset purchases—have complemented conventional instruments by injecting liquidity and lowering longer-term interest rates. Forward guidance is used to communicate the expected future path of interest rates and monetary policy, shaping market and public expectations.
+
+When inflation accelerates beyond the target, central banks typically raise these key interest rates to increase the cost of borrowing, encouraging saving over consumption [@taylor1993discretion] . This mechanism works by altering intertemporal preferences: individuals and firms weigh present versus future consumption differently, mediated by interest rate changes and expectations about inflation.
+
+Thus, central banks use a comprehensive toolkit, anchored fundamentally by short-term policy interest rates, to fulfill their mandate of price stability and economic growth.
+
+```{r interest_rates}
+
+mro_key <- "FM.B.U2.EUR.4F.KR.MRR_FR.LEV"
+deposit_facility_key <- "FM.B.U2.EUR.4F.KR.DFR.LEV"
+mlf_key <- "FM.B.U2.EUR.4F.KR.MLFR.LEV"
+
+mro <- get_data(mro_key) %>% mutate(series = "MRO")
+df <- get_data(deposit_facility_key) %>% mutate(series = "DF")
+mlf <- get_data(mlf_key) %>% mutate(series = "MLF")
+
+rates <- bind_rows(mro, df, mlf) %>% 
+  select(obstime, obsvalue, series) %>%
+  mutate(obstime = convert_dates(obstime))
+
+# Plot
+ggplot(rates, aes(x = obstime, y = obsvalue, color = series)) +
+  geom_line(linewidth = 1, alpha = 0.8) +
+  labs(
+    title = "ECB Key Interest Rates",
+    subtitle = "Main Refinancing Operations, Deposit Facility, and Marginal Lending Facility",
+    x = NULL,
+    y = "Interest Rate (%)",
+    color = "Rate Type",
+    caption = "Source: ECB") +
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white")
+  )+
+  scale_color_paletteer_d("beyonce::X1")
 
 
+
+# Combine inflation and Key Interest rates data
+inflation_and_rates <- bind_rows(hicp, rates)
+
+# Plot
+ggplot(inflation_and_rates, aes(x = obstime, y = obsvalue, color = series)) +
+  geom_line(linewidth = 1, alpha = .8) +
+  labs(
+    title = "ECB Key Interest Rates and Inflation",
+    subtitle = "Policy rates and HICP inflation rate (year-on-year % change)",
+    x = NULL,
+    y = "Percentage (%)",
+    color = "Series",
+    caption = "Source: ECB") +
+  theme(plot.title = element_text(size = 12, face = "bold",
+                                  hjust = 0.5),
+    plot.subtitle = element_text(size = 11,
+                                 hjust = 0.5),
+    plot.caption = element_text(face = "italic",
+                                hjust = 0),
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"),
+    panel.background = element_rect(fill = "white")
+  )+
+  scale_color_manual(
+    values = c(
+      "MRO" = colors[1],
+      "DF" = colors[2],
+      "MLF" = colors[3],
+      "HICP" = accent[5]
+    )
+  )
+
+
+```
+
+The bottom line of this short review of economic concepts laid on this entry is to realize the size of the tip of the iceberg. Undoubtedly complex our monetary system is, and there's some very serious people making decisions and study the signals provided by our behavior as a society. It is no joke what is going on with Bitcoin, altcoins, and crypto-currencies in general. As the system is quite enormous and intricate, getting a clear answer over any real issue is not feasible by design. The short answer is almost always a reserved 'it depends', which follows by a probably biased opinion on how the causes and solutions. The reason why? Because, as said by professor Calomiris, '[...] economics is politics, and there's not one without the other.'
+
+My take is the following: money is a promise, one that is taken very seriously by almost everyone in the world. The current system allows humanity to develop entire nations in decades time, or to sink generations into poorness and misery for centuries. Getting it right shouldn't be optional, as everyone of us is able to honor our word we are also able to play this game, to make the right decisions every day in our sphere of influence. It is evident and certain that honorable behaviors are scalable and rewarded accordingly. 
+
+It will never stop to amaze me that no matter how many equations, regressions, and sampling we do, many historic events boil down to the simple human psyche: our motivations, symbols, and the stories we are told. No matter how smart and sophisticated our methods are, we do not live on a deterministic world, and that's more than enough hope to keep on going,
+
+
+**Further readings:**
+
+- Transmission Mechanisms of Monetary Policy
+- Financial Stability and Macroprudential Policy
+- Digital Currencies and the Future of Money
