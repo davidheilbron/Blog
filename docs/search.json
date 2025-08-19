@@ -6,14 +6,21 @@
       "description": "As of August 2025",
       "author": [],
       "contents": "\n\n📄 Download (PDF)\n\n\n\n\n",
-      "last_modified": "2025-08-12T14:07:26+02:00"
+      "last_modified": "2025-08-19T22:03:08+02:00"
     },
     {
-      "path": "index.html",
+      "path": "blog.html",
       "title": "Blog",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2025-08-12T14:07:26+02:00"
+      "last_modified": "2025-08-19T22:03:09+02:00"
+    },
+    {
+      "path": "index.html",
+      "title": "Home",
+      "author": [],
+      "contents": "\n\n\n\n\nDavid Heilbron\nWelcome to my personal webpage. I’m an Economist and Data Scientist and here is where I showcase my ideas and passions.\n\nX\nGitHub\nLinkedIn\nEmail\n\n\n\n\n\n",
+      "last_modified": "2025-08-19T22:03:09+02:00"
     }
   ],
   "collections": ["posts/posts.json"]
