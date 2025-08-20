@@ -66,9 +66,9 @@ Welcome to my personal webpage. I'm an Economist and Data Scientist and here is 
 
 <div class="social-links">
 <a href="https://x.com/es_heilbron" target="_blank">X</a>
-<a href="https://github.com/your_github" target="_blank">GitHub</a>
-<a href="https://www.linkedin.com/in/your_linkedin" target="_blank">LinkedIn</a>
-<a href="mailto:your.email@example.com">Email</a>
+<a href="https://github.com/davidheilbron" target="_blank">GitHub</a>
+<a href="https://www.linkedin.com/in/heilbron" target="_blank">LinkedIn</a>
+<a href="mailto:david.heilbron@hotmail.com">Email</a>
 </div>
 
 </div>
